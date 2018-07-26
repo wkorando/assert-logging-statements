@@ -1,0 +1,8 @@
+<configuration>
+	<appender name="TESTAPPENDER"
+		class="com.bk.logging.StaticLoggingAppender" />
+
+	<root level="debug">
+		<appender-ref ref="TESTAPPENDER" />
+	</root>
+</configuration>
