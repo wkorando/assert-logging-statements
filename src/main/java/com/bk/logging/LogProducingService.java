@@ -7,7 +7,7 @@ public class LogProducingService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LogProducingService.class);
 
-	public void writeSomeLoggingStatements() {
-		LOGGER.info("Let's assert some logs!");
+	public void writeSomeLoggingStatements(String message) {
+		LOGGER.info("Let's assert some logs! " + message);
 	}
 }

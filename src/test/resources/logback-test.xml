@@ -1,8 +1,11 @@
 <configuration>
-	<appender name="TESTAPPENDER"
-		class="com.bk.logging.StaticLoggingAppender" />
+	<appender name="static-appender"
+		class="com.bk.logging.StaticLogbackAppender" />
+	<appender name="threadlocal-appender"
+		class="com.bk.logging.ThreadLocalLogbackAppender" />
 
-	<root level="debug">
-		<appender-ref ref="TESTAPPENDER" />
+	<root level="trace">
+		<appender-ref ref="static-appender" />
+		<appender-ref ref="threadlocal-appender" />
 	</root>
 </configuration>

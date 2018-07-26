@@ -6,12 +6,8 @@ import java.util.List;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
-public class StaticLoggingAppender extends AppenderBase<LoggingEvent> {
+public class ThreadLocalLogbackAppender extends AppenderBase<LoggingEvent> {
 	static List<LoggingEvent> events = new ArrayList<>();
-
-	public StaticLoggingAppender() {
-		start();
-	}
 	
 	@Override
 	public void append(LoggingEvent e) {
