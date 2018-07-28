@@ -3,15 +3,15 @@ package com.bk.logging;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
-public class StaticLogbackAppender extends AppenderBase<LoggingEvent> {
-	static ThreadLocal<List<LoggingEvent>> threadLocal = new ThreadLocal<>();
+public class ThreadSafeAppender extends AppenderBase<ILoggingEvent> {
+	static ThreadLocal<List<ILoggingEvent>> threadLocal = new ThreadLocal<>();
 	
 	@Override
-	public void append(LoggingEvent e) {
-		List<LoggingEvent> events = threadLocal.get();
+	public void append(ILoggingEvent e) {
+		List<ILoggingEvent> events = threadLocal.get();
 		if(events == null) {
 			events = new ArrayList<>();
 			threadLocal.set(events);
@@ -19,7 +19,7 @@ public class StaticLogbackAppender extends AppenderBase<LoggingEvent> {
 		events.add(e);
 	}
 
-	public static List<LoggingEvent> getEvents() {
+	public static List<ILoggingEvent> getEvents() {
 		return threadLocal.get();
 	}
 
