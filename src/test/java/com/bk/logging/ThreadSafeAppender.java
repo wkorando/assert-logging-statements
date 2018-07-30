@@ -6,6 +6,11 @@ import java.util.List;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
+/**
+ * Thread safe implementation of an appender. 
+ * @author williamkorando
+ *
+ */
 public class ThreadSafeAppender extends AppenderBase<ILoggingEvent> {
 	static ThreadLocal<List<ILoggingEvent>> threadLocal = new ThreadLocal<>();
 	
