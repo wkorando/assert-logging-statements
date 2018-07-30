@@ -31,19 +31,39 @@ public class LocalAppender extends AppenderBase<ILoggingEvent> {
 	 * 
 	 * @return
 	 */
-	public static LocalAppender initialize() {
+	public static LocalAppender initialize(String... loggers) {
 		LocalAppender localAppender = new LocalAppender();
-		localAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
-		Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-		logger.addAppender(localAppender);
+		for (String loggerName : loggers) {
+			localAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
+			Logger logger = (Logger) LoggerFactory.getLogger(loggerName);
+			logger.addAppender(localAppender);
+		}
 		return localAppender;
+	}
+
+	/**
+	 * Logback can sometimes take a moment to initialize, this method will return
+	 * false until Logbackis ready.
+	 */
+	public static void pauseTillLogbackReady() {
+		do {
+
+		} while (!isLogbackReady());
+	}
+
+	private static boolean isLogbackReady() {
+		try {
+			LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+		} catch (ClassCastException castException) {
+			return false;
+		}
+		return true;
 	}
 
 	public static void cleanup(LocalAppender localAppender) {
 		/*
 		 * Appenders cannot be easily removed when using logback, but by stopping an
-		 * appender it does at least reduce resource utilization to where even adding
-		 * thousands of local appenders shouldn't be much of an issue.
+		 * appender it does at least reduce resource utilization.
 		 */
 		localAppender.stop();
 		localAppender.clearEvents();

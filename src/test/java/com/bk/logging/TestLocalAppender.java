@@ -2,44 +2,65 @@ package com.bk.logging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
+import org.junit.jupiter.api.parallel.ResourceAccessMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 public class TestLocalAppender {
+	@BeforeAll
+	public static void setup() {
+		LocalAppender.pauseTillLogbackReady();
+	}
 
 	@Test
+	@ResourceLock(value = "LOGGING", mode = ResourceAccessMode.READ_WRITE)
 	public void testLocalAppenderA() {
-		LogProducingService service = new LogProducingService();
-		
-		LocalAppender localAppender = new LocalAppender();
-		localAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
-		Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-		logger.addAppender(localAppender);
-		
-		service.writeSomeLoggingStatements("Local appender");
-		assertThat(localAppender.getEvents()).extracting("message").containsOnly("Let's assert some logs! Local appender",
-				"This message is in a separate thread");
-		
+		OtherLogProducingService service = new OtherLogProducingService();
+
+		LocalAppender localAppender = LocalAppender.initialize("com.bk.logging.OtherLogProducingService");
+
+		service.writeSomeLoggingStatements("Other logging servie A");
+		assertThat(localAppender.getEvents()).extracting("message")
+				.containsOnly("Let's assert some logs! Other logging servie A", "This message is in a separate thread");
+
 		LocalAppender.cleanup(localAppender);
 	}
-	
+
 	@Test
+	@ResourceLock(value = "LOGGING", mode = ResourceAccessMode.READ_WRITE)
 	public void testLocalAppenderB() {
-		LogProducingService service = new LogProducingService();
-		
-		LocalAppender localAppender = new LocalAppender();
-		localAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
-		Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-		logger.addAppender(localAppender);
-		
-		service.writeSomeLoggingStatements("Local appender");
-		assertThat(localAppender.getEvents()).extracting("message").containsOnly("Let's assert some logs! Local appender",
-				"This message is in a separate thread");
-		
+		OtherLogProducingService service = new OtherLogProducingService();
+
+		LocalAppender localAppender = LocalAppender.initialize("com.bk.logging.OtherLogProducingService");
+
+		service.writeSomeLoggingStatements("Other logging servie B");
+		assertThat(localAppender.getEvents()).extracting("message")
+				.containsOnly("Let's assert some logs! Other logging servie B", "This message is in a separate thread");
+
 		LocalAppender.cleanup(localAppender);
+	}
+
+	/*
+	 * By declaring as READ, can execute in parallel with other READ test cases, but
+	 * not at the same time as a READ_WRITE test cases
+	 */
+	@Test
+	@ResourceLock(value = "LOGGING", mode = ResourceAccessMode.READ)
+	public void justAnotherTest() {
+		OtherLogProducingService service = new OtherLogProducingService();
+		service.writeSomeLoggingStatements("Local appender");
+
+		// Executing just to add some logs
+	}
+
+	@Test
+	@ResourceLock(value = "LOGGING", mode = ResourceAccessMode.READ)
+	public void yetAnotherTest() {
+		OtherLogProducingService service = new OtherLogProducingService();
+		service.writeSomeLoggingStatements("Local appender");
+
+		// Executing just to add some logs
 	}
 
 }

@@ -7,9 +7,9 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LogProducingService {
+public class OtherLogProducingService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(LogProducingService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(OtherLogProducingService.class);
 
 	public void writeSomeLoggingStatements(String message) {
 		LOGGER.info("Let's assert some logs! " + message);

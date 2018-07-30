@@ -13,6 +13,7 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<junit-jupiter.version>5.3.0-M1</junit-jupiter.version>
+		<enable-parallel-tests>false</enable-parallel-tests>
 	</properties>
 
 	<dependencies>
@@ -59,18 +60,29 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>parallel-test-execution</id>
+			<properties>
+				<enable-parallel-tests>true</enable-parallel-tests>
+				<excludeGroups>SINGLE_THREAD_ONLY</excludeGroups>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
+				<!-- By default surefire will execute single threaded. Run with parallel-test-execution 
+					to execute tests in parallel -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.0</version>
 				<configuration>
+					<excludedGroups>${excludeGroups}</excludedGroups>
 					<properties>
 						<configurationParameters>
-							<!-- surefire will fail when set to true because StaticAppender is 
-								picking up all log statements -->
-							junit.jupiter.execution.parallel.enabled=true
+							junit.jupiter.execution.parallel.enabled=${enable-parallel-tests}
 							junit.jupiter.execution.parallel.config.dynamic.factor=1
 						</configurationParameters>
 					</properties>
